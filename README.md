@@ -1,13 +1,4 @@
-# 状态 12.23/2023
 
-工作进展：
-
-1. zig build explain 共三个部分，我已经翻译完成第一部分
-2. 代码已经升级到0.11
-
-下一步：
-1. 可以发布第一部分，或者晚点全部做完，然后一起发布
-2. 到时候是发给群主，还是github做PR？
 
 # zigcc
 
@@ -66,4 +57,6 @@
             // 译者reco
             const bundle_app = b.addRunArtifact(deploy_tool);
             // const bundle_app = deploy_tool.run();
-            
+
+
+有人做了zigbuild api变化的记录：https://devlog.hexops.com/2023/zig-0-11-breaking-build-changes/
