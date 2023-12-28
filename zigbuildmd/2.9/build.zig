@@ -1,20 +1,10 @@
+//demo2.9
 const std = @import("std");
-
-pub fn build(b: *std.Build) void {
-    const target = b.standardTargetOptions(.{});
-    const optimize = b.standardOptimizeOption(.{});
-    const use_platform_io = b.option(bool, "platform-io", "Uses the native api instead of the C wrapper") orelse true;
-    _ = use_platform_io;
-    const exe = b.addExecutable(.{
-        .name = "example",
-        .target = target,
-        .optimize = optimize,
-    });
+pub fn build(b: *std.build.Builder) !void {
     var sources = std.ArrayList([]const u8).init(b.allocator);
-
     // Search for all C/C++ files in `src` and add them
     {
-        var dir = try std.fs.cwd().openDir("src", .{ .iterate = true });
+        var dir = try std.fs.cwd().openIterableDir(".", .{ .access_sub_paths = true });
 
         var walker = try dir.walk(b.allocator);
         defer walker.deinit();
@@ -32,11 +22,16 @@ pub fn build(b: *std.Build) void {
             }
         }
     }
-
-    exe.addCSourceFiles(.{ .file = std.build.LazyPath.relative("print-main.c"), .flags = &.{} });
-
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+    const exe = b.addExecutable(.{
+        .name = "example",
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.addCSourceFiles(sources.items, &.{});
     exe.linkLibC();
-
+    exe.linkLibCpp();
     b.installArtifact(exe);
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
