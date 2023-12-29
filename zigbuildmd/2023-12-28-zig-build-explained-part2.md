@@ -32,11 +32,15 @@ Zig 提供了 LLVM c 编译器 clang。第一种是 zig cc 或 zig c++，它是�
 ## 使用 zig build-exe 和其他工具
 
 使用 Zig 工具链构建 C 项目的另一种方法与构建 Zig 项目的方法相同：
+
     zig build-exe -lc main.c buffer.c
+
 这里的主要区别在于，必须明确传递 -lc 才能链接到 libc，而且可执行文件的名称将从传递的第一个文件中导出。如果想使用不同的可执行文件名，可通过 --name example 再次获取示例文件。
 
 交叉编译也是如此，只需通过 -target x86_64-windows-gnu 或其他目标三元组即可：
+
     zig build-exe -lc -target x86_64-windows-gnu main.c buffer.c
+
 你会发现，使用这条编译命令，Zig 会自动在输出文件中附加 .exe 扩展名，并生成 .pdb 调试数据库。如果你在此处传递 --name example，输出文件也会有正确的 .exe 扩展名，所以你不必考虑这个问题。
 
 ## 用 build.zig 创建 C 代码
@@ -44,6 +48,7 @@ Zig 提供了 LLVM c 编译器 clang。第一种是 zig cc 或 zig c++，它是�
 那么，我们如何用 build.zig 构建我们的双文件小范例呢？
 
 首先，我们需要创建一个新的编译目标：
+
     // demo2.1
     const std = @import("std");
     pub fn build(b: *std.Build) void {
@@ -103,24 +108,24 @@ Zig 提供了 LLVM c 编译器 clang。第一种是 zig cc 或 zig c++，它是�
 
     int main(int argc, char ** argv) 
     {
-    if(argc != 2)
-        return 1;
+        if(argc != 2)
+            return 1;
 
-    char const * url = argv[1];
-    CURL * curl = curl_easy_init();
-    if (curl == NULL)
-        return 1;
+        char const * url = argv[1];
+        CURL * curl = curl_easy_init();
+        if (curl == NULL)
+            return 1;
 
-    curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeData);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, stdout);
-    CURLcode res = curl_easy_perform(curl);
-    curl_easy_cleanup(curl);
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeData);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, stdout);
+        CURLcode res = curl_easy_perform(curl);
+        curl_easy_cleanup(curl);
 
-    if(res != CURLE_OK)
-        return 1;
+        if(res != CURLE_OK)
+            return 1;
 
-    return 0;
+        return 0;
     }
 
 要编译这个程序，我们需要向编译器提供正确的参数，包括包含路径、库和其他参数。幸运的是，我们可以使用 Zig 内置的 pkg-config 集成：
@@ -158,7 +163,6 @@ Zig 提供了 LLVM c 编译器 clang。第一种是 zig cc 或 zig c++，它是�
 
     //demo 2.3
     const std = @import("std");
-
     pub fn build(b: *std.Build) void {
         const target = b.standardTargetOptions(.{});
         const optimize = b.standardOptimizeOption(.{});
@@ -193,6 +197,7 @@ addIncludePath 和 addLibraryPath 都可以被多次调用，以向编译器添�
 
 因此，如果我们需要为每个 C 文件设置不同的包含路径，我们就需要用不同的方法来解决这个问题：
 由于我们仍然可以通过 addCSourceFile 传递任何 C 编译器标志，因此我们也可以在这里手动设置包含目录。
+
         //demo2.4
         const std = @import("std");
         pub fn build(b: *std.Build) void {
@@ -225,7 +230,6 @@ addIncludePath 和 addLibraryPath 都可以被多次调用，以向编译器添�
 
     //demo2.5
     const std = @import("std");
-
     pub fn build(b: *std.Build) void {
         const target = b.standardTargetOptions(.{});
         const optimize = b.standardOptimizeOption(.{});
@@ -256,9 +260,9 @@ addIncludePath 和 addLibraryPath 都可以被多次调用，以向编译器添�
 ## 指定语言版本
 
 试想一下，如果你创建了一个庞大的项目，其中的 C 或 C++ 文件有新有旧，而且可能是用不同的语言标准编写的。为此，我们可以使用编译器标志来传递 -std=c90 或 -std=c++98：
+
     //demo2.6
     const std = @import("std");
-
     pub fn build(b: *std.Build) void {
         const target = b.standardTargetOptions(.{});
         const optimize = b.standardOptimizeOption(.{});
@@ -292,9 +296,9 @@ addIncludePath 和 addLibraryPath 都可以被多次调用，以向编译器添�
 与 Zig 相比，C 和 C++ 的条件编译方式非常繁琐。由于缺乏 "懒评估"，有时必须根据目标文件来包含/排除文件。你还必须提供宏定义来启用/禁用某些项目功能。
 
 Zig 编译系统可以轻松处理这两种变体：
+
     //demo2.7
     const std = @import("std");
-
     pub fn build(b: *std.Build) void {
         const target = b.standardTargetOptions(.{});
         const optimize = b.standardOptimizeOption(.{});
@@ -343,6 +347,7 @@ Zig 编译系统可以轻松处理这两种变体：
 由于大多数 C（更糟糕的是 C++）项目都有大量文件（SDL2 有 411 个 C 文件和 40 个 C++ 文件），我们必须找到一种更简单的方法来编译它们。调用 addCSourceFile 400 次并不能很好地扩展。
 
 因此，我们可以做的第一个优化就是将 c 和 c++ 标志放入各自的变量中：
+
     //demo2.8
     const std = @import("std");
     pub fn build(b: *std.Build) void {
@@ -445,6 +450,7 @@ addCSourceFile 还有一个变种，叫做 addCSourceFiles。它使用的不是�
 我完全忘了！Zig 不仅支持编译 C 和 C++，还支持通过 clang 编译 Objective C！
 
 虽然不支持 C 或 C++，但至少在 macOS 上，你已经可以编译 Objective C 程序并添加框架了：
+
     //demo2.10
     const std = @import("std");
 
@@ -481,7 +487,6 @@ addCSourceFile 还有一个变种，叫做 addCSourceFiles。它使用的不是�
 
     //demo2.11
     const std = @import("std");
-
     pub fn build(b: *std.Build) void {
         const target = b.standardTargetOptions(.{});
         const optimize = b.standardOptimizeOption(.{});
