@@ -3,11 +3,13 @@ pub fn build(b: *std.build.Builder) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
     const exe = b.addExecutable(.{
-        .name = "fresh",
-        .root_source_file = .{ .path = "src/main.zig" },
+        .name = "test",
+        .root_source_file = .{ .path = "main.zig" },
         .target = target,
         .optimize = optimize,
     });
-    const install_exe = b.addInstallArtifact(exe, .{});
-    b.getInstallStep().dependOn(&install_exe.step);
+    b.installArtifact(exe);
+    const cmd = b.addSystemCommand(&.{"size"});
+    cmd.addArtifactArg(exe);
+    b.getInstallStep().dependOn(&cmd.step);
 }

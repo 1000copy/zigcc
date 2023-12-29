@@ -4,13 +4,15 @@ pub fn build(b: *std.build.Builder) void {
     const optimize = b.standardOptimizeOption(.{});
     const exe = b.addExecutable(.{
         .name = "test",
-        .root_source_file = .{ .path = "main.zig" },
+        .root_source_file = .{ .path = "src/main.zig" },
         .target = target,
         .optimize = optimize,
     });
+    const cmd = b.addSystemCommand(&.{
+        "flex",
+        "-outfile=lines.c",
+        "lines.l",
+    });
     b.installArtifact(exe);
-    exe.linkLibC();
-    exe.addIncludePath(.{ .path = "/usr/local/Cellar/curl/8.5.0/include" });
-    exe.addLibraryPath(.{ .path = "/usr/local/Cellar/curl/8.5.0/lib" });
-    exe.addObjectFile(.{ .path = "/usr/local/Cellar/curl/8.5.0/lib/libcurl.a" });
+    exe.step.dependOn(&cmd.step);
 }
