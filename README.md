@@ -1,8 +1,8 @@
 # Zig构建系统解析系列文章
 
-[第一部分](zigbuildmd/2023-12-24-zig-build-explained-part1.md)
-[第二部分](zigbuildmd//2023-12-28-zig-build-explained-part2.md)
-[第三部分](zigbuildmd/2023-12-29-zig-build-explained-part3.md)
+- [第一部分](zigbuildmd/2023-12-24-zig-build-explained-part1.md)
+- [第二部分](zigbuildmd//2023-12-28-zig-build-explained-part2.md)
+- [第三部分](zigbuildmd/2023-12-29-zig-build-explained-part3.md)
 
 # 翻译后记录
 
