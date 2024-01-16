@@ -10,7 +10,7 @@ pub fn build(b: *std.Build) void {
     exe.addCSourceFile(.{ .file = std.build.LazyPath.relative("bass-player.c"), .flags = &.{} });
     exe.addIncludePath(std.build.LazyPath.relative("bass/linux"));
     exe.addLibraryPath(std.build.LazyPath.relative("bass/linux/x64"));
-    exe.linkSystemLibraryName("bass");
+    // exe.linkSystemLibraryName("bass");
     b.installArtifact(exe);
     const run_cmd = b.addRunArtifact(exe);
     run_cmd.step.dependOn(b.getInstallStep());
